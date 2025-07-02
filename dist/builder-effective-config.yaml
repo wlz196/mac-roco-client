@@ -1,0 +1,17 @@
+directories:
+  output: dist
+  buildResources: build
+asar: false
+appId: com.yourdomain.luoke
+productName: 洛克王国微端
+mac:
+  category: public.app-category.games
+  target:
+    - dmg
+files:
+  - filter:
+      - '**/*'
+      - main.js
+      - plugins/**
+      - package.json
+electronVersion: 11.5.0
