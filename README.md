@@ -43,7 +43,7 @@
    ```
 2. **安装依赖**
    ```bash
-   npm install
+   npm_config_arch=x64 npm install
    ```
 3. **开发模式运行**
    ```bash
