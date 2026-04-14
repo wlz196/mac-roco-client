@@ -1,24 +1,13 @@
-const { app, BrowserWindow, session } = require('electron');
-const path = require('path');
+const { app, BrowserWindow } = require('electron');
+const {
+  ensureFlashRuntimeConfig,
+  getFlashPluginPath,
+  getFlashPluginVersion,
+} = require('./flash-runtime');
 
-// 适配开发环境和打包后环境的Flash插件路径
-function getFlashPluginPath() {
-  // 打包后，插件应放在 resources/plugins/PepperFlashPlayer.plugin
-  const prodPath = path.join(process.resourcesPath, 'app/plugins', 'PepperFlashPlayer.plugin');
-  // 开发环境，插件在项目根目录 plugins/PepperFlashPlayer.plugin
-  const devPath = path.join(__dirname, 'plugins', 'PepperFlashPlayer.plugin');
-  // 判断哪个路径存在
-  const fs = require('fs');
-  if (fs.existsSync(prodPath)) {
-    return prodPath;
-  } else {
-    return devPath;
-  }
-}
-
-let version = '34.0.0.330';
-app.commandLine.appendSwitch('ppapi-flash-path', getFlashPluginPath());
-app.commandLine.appendSwitch('ppapi-flash-version', version);
+const flashPluginPath = getFlashPluginPath();
+app.commandLine.appendSwitch('ppapi-flash-path', flashPluginPath);
+app.commandLine.appendSwitch('ppapi-flash-version', getFlashPluginVersion(flashPluginPath));
 app.commandLine.appendSwitch('--disable-http-cache');
 
 function createWindow() {
@@ -48,7 +37,10 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(async () => {
+  await ensureFlashRuntimeConfig(app.getPath('userData'));
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
